@@ -7,6 +7,10 @@ from modules.auth_manager import AuthManager
 def initial_handshake():
     # 1. Initial Handshake: On startup, the console must prompt: Input Your Api Path (JSON):
     print("Welcome to BongoDB Portable (v2.0)")
+    if os.path.exists('credentials.json'):
+        print("Found credentials.json in root. Using it for initialization...")
+        return 'credentials.json'
+    
     while True:
         api_path = input("Input Your Api Path (JSON): ").strip()
         if os.path.exists(api_path):
