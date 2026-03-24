@@ -3,6 +3,6 @@ google-auth
 google-api-python-client
 google-auth-oauthlib
 google-auth-httplib2
-werkzeug
 flask
-bcrypt
+flask-cors
+werkzeug

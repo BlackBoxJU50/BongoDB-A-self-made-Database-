@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block title %}Hero{% endblock %}
+{% block content %}
+<div style="text-align: center; padding: 4rem 0;" class="animate-fade">
+    <h1 style="font-size: 4rem;">Power Your Backend,<br><span style="background: linear-gradient(90deg, #6366f1, #f43f5e); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">For Free.</span></h1>
+    <p style="max-width: 600px; margin: 0 auto 2rem; font-size: 1.2rem;">
+        BongoDB turns Google Sheets into your personal NoSQL cloud. Scalable, self-made, and fully protected.
+    </p>
+    <div style="display: flex; gap: 1rem; justify-content: center;">
+        <a href="/signup" class="btn btn-primary" style="padding: 16px 40px; font-size: 1.1rem;">Build Your Workspace</a>
+        <a href="/login" class="btn glass-panel" style="padding: 16px 40px; font-size: 1.1rem; color: white;">Access Dashboard</a>
+    </div>
+</div>
+
+<div class="product-grid animate-fade" style="animation-delay: 0.2s;">
+    <div class="glass-panel" style="padding: 2rem;">
+        <h3 style="color: var(--primary); margin-bottom: 1rem;">Core API Ready</h3>
+        <p>Integrate with Node.js, PHP, or Python using our professional REST API.</p>
+    </div>
+    <div class="glass-panel" style="padding: 2rem;">
+        <h3 style="color: var(--accent); margin-bottom: 1rem;">Personal Drive Storage</h3>
+        <p>Host product images and files directly in your users' secure Google Drive folders.</p>
+    </div>
+    <div class="glass-panel" style="padding: 2rem;">
+        <h3 style="color: #10b981; margin-bottom: 1rem;">No Code Exposure</h3>
+        <p>Compile and distribute your database engine as a standalone software product.</p>
+    </div>
+</div>
+{% endblock %}

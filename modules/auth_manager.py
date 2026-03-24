@@ -1,14 +1,17 @@
-import uuid
+import os
+import sys
 import random
-from werkzeug.security import generate_password_hash, check_password_hash
 from modules.bongo_db import BongoDB
 from modules.drive_io import DriveIO
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
+import google_auth_oauthlib.flow
+import google.auth.transport.requests
+import google.oauth2.credentials
 from google.oauth2.credentials import Credentials
-import os
-import json
-from config import CLIENT_SECRETS_FILE, TOKEN_FILE
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from google.auth.transport.requests import Request
+
+from config import CLIENT_SECRETS_FILE, TOKEN_FILE, HEADERS
 
 # OAuth Scopes
 SCOPES = [
@@ -17,76 +20,85 @@ SCOPES = [
 ]
 
 class AuthManager:
-    def __init__(self, credentials=None):
-        self.creds = credentials
+    def __init__(self, credentials=None, spreadsheet_id=None):
         if credentials:
-            self.db = BongoDB(credentials)
+            self.db = BongoDB(credentials, spreadsheet_id)
             self.drive = DriveIO(credentials)
+        else:
+            self.db = None
+            self.drive = None
+
+    @staticmethod
+    def get_base_dir():
+        if getattr(sys, 'frozen', False):
+            return os.path.dirname(sys.executable)
+        return os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
     @staticmethod
     def get_credentials():
+        base_dir = AuthManager.get_base_dir()
+        token_path = os.path.join(base_dir, TOKEN_FILE)
+        secrets_path = os.path.join(base_dir, CLIENT_SECRETS_FILE)
+        
+        print(f"[*] BongoDB Path Debug: {base_dir}")
+        
         creds = None
-        if os.path.exists(TOKEN_FILE):
-            creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
+        if os.path.exists(token_path):
+            try:
+                creds = Credentials.from_authorized_user_file(token_path, SCOPES)
+            except Exception as e:
+                print(f"[!] Error loading token: {e}")
         
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
-                creds.refresh(Request())
-            else:
-                if not os.path.exists(CLIENT_SECRETS_FILE):
-                    raise FileNotFoundError(f"{CLIENT_SECRETS_FILE} not found. Please download it from Google Cloud Console.")
-                
-                flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
-                creds = flow.run_local_server(port=0)
+                try:
+                    creds.refresh(Request())
+                except Exception as e:
+                    print(f"[!] Token Refresh Failed: {e}")
+                    creds = None
             
-            with open(TOKEN_FILE, 'w') as token:
-                token.write(creds.to_json())
+            if not creds or not creds.valid:
+                if not os.path.exists(secrets_path):
+                    print(f"[!] Secrets Missing at: {secrets_path}")
+                    return None
+                
+                try:
+                    flow = InstalledAppFlow.from_client_secrets_file(
+                        secrets_path, SCOPES)
+                    # Force prompt='consent' to ensure user sees all requested scopes (Drive + Sheets)
+                    creds = flow.run_local_server(port=0, 
+                                                authorization_prompt_message='BongoDB Cloud Engine: Requesting Permissions...',
+                                                prompt='consent')
+                except Exception as e:
+                    print(f"[!] OAuth Flow Error: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    return None
+            
+            if creds:
+                # Save the credentials for the next run
+                try:
+                    with open(token_path, 'w') as token:
+                        token.write(creds.to_json())
+                    print(f"[*] Credentials saved successfully to: {token_path}")
+                except Exception as e:
+                    print(f"[!] Failed to save token.json: {e}")
         
         return creds
 
-    def self_check(self):
+    def self_check(self, spreadsheet_id, drive_id):
         # 1. Check Sheet Access
         try:
-            self.db.get_sheet()
+            if not spreadsheet_id: return False, "SPREADSHEET_ID not set"
+            self.db.client.open_by_key(spreadsheet_id)
         except Exception as e:
-            return False, f"Google Sheet Access Error: {e}\nTIP: Make sure you shared the sheet with the service account email as Editor."
+            return False, f"Google Sheet Access Error: {e}"
             
         # 2. Check Drive Access
         try:
-            self.drive.service.files().get(fileId=self.drive.credentials_path if hasattr(self.drive, 'credentials_path') else os.getenv('BONGODB_DRIVE_FOLDER_ID')).execute()
-        except:
-            # Fallback check: list files in root folder
-            from config import DRIVE_ROOT_FOLDER_ID
-            try:
-                self.drive.service.files().get(fileId=DRIVE_ROOT_FOLDER_ID).execute()
-            except Exception as e:
-                return False, f"Google Drive Access Error: {e}\nTIP: Make sure you shared the folder with the service account email as Editor."
-                
-        return True, "All systems operational!"
-
-    def register(self, name, email, password, image_path):
-        # 1. Generate unique UID (Name-RandomDigits)
-        random_id = random.randint(10000000, 99999999)
-        uid = f"{name.replace(' ', '')}-{random_id}"
-        
-        # 2. Drive Logic: Create folder named after UID and upload image
-        try:
-            folder_id = self.drive.create_uid_folder(uid)
-            file_id, image_url = self.drive.upload_image(image_path, folder_id)
+            if not drive_id: return False, "DRIVE_ROOT_FOLDER_ID not set"
+            self.drive.service.files().get(fileId=drive_id).execute()
         except Exception as e:
-            return False, f"Drive Error: {str(e)}"
-
-        # 2. Hash password (using pbkdf2:sha256 as fallback for scrypt issues)
-        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
-        try:
-            self.db.add_user(uid, name, email, hashed_password, folder_id, image_url)
-        except Exception as e:
-            return False, f"Sheet Error: {str(e)}"
-
-        return True, uid
-
-    def login(self, uid, password):
-        user = self.db.get_user_by_uid(uid)
-        if user and check_password_hash(user['Password'], password):
-            return True, user
-        return False, "Invalid UID or Password"
+            return False, f"Google Drive Access Error: {e}"
+                 
+        return True, "Cloud Storage Connected!"

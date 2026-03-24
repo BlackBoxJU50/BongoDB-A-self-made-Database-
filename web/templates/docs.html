@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+{% block title %}API Documentation{% endblock %}
+
+{% block content %}
+<div class="animate-fade" style="max-width: 1000px; margin: 0 auto; padding-bottom: 5rem;">
+    <div style="margin-bottom: 4rem;">
+        <h1 style="font-size: 3rem; margin-bottom: 1rem;">Developer API Documentation</h1>
+        <p style="color: var(--text-muted); font-size: 1.1rem;">Integrate BongoDB into any website or application using simple HTTP requests.</p>
+    </div>
+
+    <!-- Integration Grid -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 3rem;">
+        <div class="glass-panel" style="padding: 2.5rem;">
+            <h2 style="color: var(--primary); margin-bottom: 1.5rem;">🚀 Quick Start</h2>
+            <p>BongoDB runs locally on <code>http://localhost:5001</code>. You can send JSON data to your cloud using these endpoints.</p>
+
+            <h3 style="margin-top: 2rem;">1. Insert Record</h3>
+            <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                <code>POST /api/v1/insert</code>
+            </div>
+            <pre style="background: #1e1e1e; padding: 1.5rem; border-radius: 8px; font-size: 0.9rem; border: 1px solid var(--glass-border);">
+{
+  "collection": "Products",
+  "data": {
+    "name": "Luxury Watch",
+    "price": 299,
+    "stock": 15
+  }
+}</pre>
+
+            <h3 style="margin-top: 2rem;">2. Find Records</h3>
+            <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                <code>GET /api/v1/find?collection=Products</code>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Returns all rows from the specified Google Sheet collection.</p>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+            <div class="glass-panel" style="padding: 2rem; border-color: var(--accent);">
+                <h3 style="color: var(--accent);">Cloud Storage</h3>
+                <p style="font-size: 0.9rem;">To upload images, use the <code>/api/v1/upload</code> endpoint. Files are stored directly in your linked Google Drive folder.</p>
+            </div>
+            
+            <div class="glass-panel" style="padding: 2rem; border-color: #10b981;">
+                <h3 style="color: #10b981;">Security</h3>
+                <p style="font-size: 0.9rem;">BongoDB uses your local OAuth session. No API Key is required when running locally alongside your development server.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div style="margin-top: 4rem; text-align: center;">
+        <a href="/" class="btn btn-primary" style="padding: 1rem 3rem;">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

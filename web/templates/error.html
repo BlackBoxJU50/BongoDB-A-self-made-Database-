@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="animate-fade" style="text-align: center; padding-top: 5rem;">
+    <div class="glass-panel" style="max-width: 600px; margin: 0 auto; padding: 3rem; border-color: var(--accent);">
+        <h1 style="color: var(--accent); margin-bottom: 1.5rem;">⚠️ {{ title }}</h1>
+        <p style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 2rem;">{{ msg }}</p>
+        
+        <div style="background: rgba(239, 68, 68, 0.1); padding: 1rem; border-radius: 8px; text-align: left; font-size: 0.9rem;">
+            <p><strong>Steps to fix:</strong></p>
+            <ol style="margin-top: 0.5rem;">
+                <li>Download your OAuth JSON from Google Cloud.</li>
+                <li>Rename it to `client_secrets.json`.</li>
+                <li>Paste it into the BongoDB root folder.</li>
+                <li>Restart BongoDB.</li>
+            </ol>
+        </div>
+        
+        <div style="margin-top: 2rem;">
+            <a href="/" class="btn btn-primary">Try Again</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

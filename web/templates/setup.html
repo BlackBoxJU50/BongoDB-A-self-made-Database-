@@ -1,0 +1,87 @@
+{% extends "layout.html" %}
+{% block title %}Setup Cloud Engine{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;" class="animate-fade">
+    <div style="margin-bottom: 4rem; text-align: center;">
+        <h1 style="font-size: 3.5rem; background: linear-gradient(135deg, #fff 0%, #6366f1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Connect Your Cloud</h1>
+        <p style="color: var(--text-muted); font-size: 1.2rem; margin-bottom: 2rem;">Complete these 3 professional steps to activate your BongoDB Cloud Engine.</p>
+        
+        <div style="display: flex; justify-content: center; gap: 1rem;">
+            <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="btn btn-secondary" style="background: rgba(255,255,255,0.05);">
+                Cloud Console ↗
+            </a>
+            <a href="https://drive.google.com" target="_blank" class="btn btn-secondary" style="background: rgba(255,255,255,0.05);">
+                Google Drive 📁
+            </a>
+            <a href="/docs" class="btn btn-secondary" style="background: rgba(255,255,255,0.05);">
+                API Docs 📖
+            </a>
+        </div>
+    </div>
+
+    <!-- Interactive Stepper -->
+    <div style="display: flex; gap: 2rem; margin-bottom: 4rem;">
+        <div class="glass-panel" style="flex: 1; padding: 2rem; border-left: 4px solid var(--primary);">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                <span style="background: var(--primary); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">1</span>
+                <h3 style="margin: 0;">API Gateway</h3>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Enable <b>Sheets API</b> and <b>Drive API</b> in the Console.</p>
+        </div>
+        <div class="glass-panel" style="flex: 1; padding: 2rem; border-left: 4px solid var(--accent);">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                <span style="background: var(--accent); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">2</span>
+                <h3 style="margin: 0;">Auth Scope</h3>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Set OAuth to <b>External</b> and add your email to <b>Test Users</b>.</p>
+        </div>
+        <div class="glass-panel" style="flex: 1; padding: 2rem; border-left: 4px solid #10b981;">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                <span style="background: #10b981; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">3</span>
+                <h3 style="margin: 0;">Local Secret</h3>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Create <b>OAuth Client ID</b> (Desktop App) and download the JSON.</p>
+        </div>
+    </div>
+
+    <div class="glass-panel" style="padding: 4rem; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: var(--primary); filter: blur(100px); opacity: 0.2;"></div>
+        
+        <h2 style="margin-bottom: 3rem; font-size: 2rem;">Cloud Engine Configuration</h2>
+        <form action="/setup" method="POST">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <div class="form-group">
+                    <label style="color: var(--primary);">DATABASE ID (GOOGLE SHEETS)</label>
+                    <input type="text" name="spreadsheet_id" value="{{ curr_ss }}" placeholder="Ex: 1-7u_..." required style="background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); padding: 1rem; border-radius: 8px; color: white; width: 90%;">
+                    <p style="font-size: 0.8rem; margin-top: 0.8rem; color: var(--text-muted);">Your primary data engine.</p>
+                    {% if error and 'Permission Denied' in error %}
+                    <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 1rem; margin-top: 1rem; border-radius: 4px;">
+                        <p style="color: #fca5a5; font-size: 0.9rem; margin: 0; font-weight: bold;">⚠️ Permission Denied (403)</p>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem; line-height: 1.4;">
+                            BongoDB cannot access this spreadsheet. Because BongoDB uses your personal Google Account to log in, you must ensure that the <b>Google Account you authenticated with</b> has <b>Editor</b> access to this specific spreadsheet.<br><br>
+                            <b>Fix:</b> Open the Google Sheet in your browser, click "Share", and add the email address you used to log into BongoDB.
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label style="color: var(--accent);">ASSET STORAGE ID (GOOGLE DRIVE)</label>
+                    <input type="text" name="drive_id" value="{{ curr_dr }}" placeholder="Ex: 1oD_..." required style="background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); padding: 1rem; border-radius: 8px; color: white; width: 90%;">
+                    <p style="font-size: 0.8rem; margin-top: 0.8rem; color: var(--text-muted);">Your cloud media storage.</p>
+                </div>
+            </div>
+
+            <div style="margin-top: 4rem; display: flex; justify-content: center;">
+                <button type="submit" class="btn btn-primary" style="padding: 1.5rem 4rem; font-size: 1.3rem; border-radius: 50px; box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);">
+                    Activate Cloud Engine ⚡
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div style="margin-top: 4rem; text-align: center; color: var(--text-muted);">
+        <p>BongoDB Cloud Engine v2.0 | Secured by Google OAuth 2.0</p>
+    </div>
+</div>
+{% endblock %}

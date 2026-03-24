@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block title %}Browse: {{ name }}{% endblock %}
+
+{% block content %}
+<div class="animate-fade">
+    <div style="margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem;">
+        <a href="/" style="color: var(--text-muted); text-decoration: none;">← Dashboard</a>
+        <h1 style="margin: 0;">Collection: {{ name }}</h1>
+    </div>
+
+    <div class="glass-panel" style="overflow-x: auto; padding: 1.5rem;">
+        {% if data %}
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--glass-border);">
+                    {% for h in headers %}
+                    <th style="padding: 1rem; color: var(--primary);">{{ h }}</th>
+                    {% endfor %}
+                    <th style="padding: 1rem;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    {% for h in headers %}
+                    <td style="padding: 1rem;">{{ row[h] }}</td>
+                    {% endfor %}
+                    <td style="padding: 1rem;">
+                        <button style="background: none; border: none; color: var(--accent); cursor: pointer;">Delete</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div style="padding: 4rem; text-align: center;">
+            <p>This collection is empty.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

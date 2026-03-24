@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BongoDB - {% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="container animate-fade">
+        <a href="/" class="logo">BongoDB <span style="color:white; font-weight: 400;">Cloud Engine</span></a>
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%;"></div>
+                <span style="font-size: 0.9rem; color: var(--text-muted);">Cloud Status: Connected</span>
+            </div>
+            <a href="/" class="btn btn-primary">Dashboard</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="container" style="text-align: center; margin-top: auto; padding-bottom: 2rem;">
+        <p>© 2026 BongoDB. Built Professional.</p>
+    </footer>
+</body>
+</html>

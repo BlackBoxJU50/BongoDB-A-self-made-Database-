@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="animate-fade" style="text-align: center; padding-top: 5rem;">
+    <div class="glass-panel" style="max-width: 600px; margin: 0 auto; padding: 4rem; border-color: #f59e0b;">
+        <div style="font-size: 4rem; margin-bottom: 1.5rem;">🔐</div>
+        <h1 style="color: #f59e0b; margin-bottom: 1.5rem;">Authentication Status</h1>
+        
+        {% if error and ("403" in error or "disabled" in error.lower()) %}
+        <div style="background: rgba(239, 68, 68, 0.15); border: 2px solid #ef4444; border-radius: 12px; padding: 2.5rem; text-align: left; margin-bottom: 2rem; box-shadow: 0 0 30px rgba(239, 68, 68, 0.2);">
+            <h2 style="color: #ef4444; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                ⚠️ ACTION REQUIRED
+            </h2>
+            <p style="font-size: 1rem; line-height: 1.5; color: white;">
+                Your Google Cloud Project (<b>225750268761</b>) has the <b>Sheets API disabled</b>. BongoDB cannot read your data until this is turned on.
+            </p>
+            
+            <a href="https://console.developers.google.com/apis/api/sheets.googleapis.com/overview?project=225750268761" target="_blank" class="btn btn-primary" style="margin-top: 1.5rem; background: #ef4444; width: 100%; border: none; font-weight: bold; padding: 1.2rem;">
+                CLICK HERE TO ENABLE API ↗
+            </a>
+            
+            <div style="margin-top: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+                <button onclick="window.location.reload()" class="btn btn-secondary" style="flex: 1; font-size: 0.9rem;">
+                    I've Enabled It! (Refresh)
+                </button>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1.5rem; font-style: italic;">
+                Note: Google usually takes 30-60 seconds to activate the API after you click "Enable".
+            </p>
+        </div>
+        {% elif error %}
+        <div style="background: rgba(245, 158, 11, 0.1); padding: 2rem; border-radius: 12px; text-align: left; margin-bottom: 2rem; border: 1px solid var(--glass-border);">
+            <p style="color: var(--primary); font-weight: bold;">Connection Note:</p>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">{{ error }}</p>
+        </div>
+        {% else %}
+        <p style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 2.5rem;">Your Google Cloud session is not yet active.</p>
+        {% endif %}
+        
+        <div style="background: rgba(255, 255, 255, 0.03); padding: 2rem; border-radius: 12px; text-align: left; margin-bottom: 3rem;">
+            <p style="font-size: 0.9rem; color: var(--text-muted);">
+                <b>Don't have a token?</b> Click below to sign in with your developer account.
+            </p>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <a href="/authenticate" class="btn btn-primary" style="padding: 1rem 3rem; font-size: 1.1rem; background: #f59e0b; border: none; flex: 1;">
+                Primary Login 🔑
+            </a>
+            <a href="/setup" class="btn btn-secondary" style="flex: 1;">
+                Settings ⚙️
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
