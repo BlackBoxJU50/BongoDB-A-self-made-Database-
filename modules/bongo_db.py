@@ -8,16 +8,11 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from config import SPREADSHEET_ID, USERS_SHEET_NAME, HEADERS
 
 class BongoDB:
-    def __init__(self, credentials_path):
-        scopes = [
-            'https://www.googleapis.com/auth/spreadsheets',
-            'https://www.googleapis.com/auth/drive'
-        ]
-        self.credentials = Credentials.from_service_account_file(
-            credentials_path, scopes=scopes
-        )
-        self.client = gspread.authorize(self.credentials)
+    def __init__(self, credentials):
+        # Initialize gspread with the provided OAuth credentials
+        self.client = gspread.authorize(credentials)
         self.spreadsheet = self.client.open_by_key(SPREADSHEET_ID)
+        self.sheet = self.get_sheet()
 
     def get_sheet(self):
         try:

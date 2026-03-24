@@ -9,12 +9,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from config import DRIVE_ROOT_FOLDER_ID
 
 class DriveIO:
-    def __init__(self, credentials_path):
-        scopes = ['https://www.googleapis.com/auth/drive']
-        self.credentials = Credentials.from_service_account_file(
-            credentials_path, scopes=scopes
-        )
-        self.service = build('drive', 'v3', credentials=self.credentials)
+    def __init__(self, credentials):
+        # Initialize Drive API with the provided OAuth credentials
+        self.service = build('drive', 'v3', credentials=credentials)
 
     def create_uid_folder(self, uid):
         # Task 1: Create a folder named after the UID

@@ -1,13 +1,47 @@
-from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
-import os
+from werkzeug.security import generate_password_hash, check_password_hash
 from modules.bongo_db import BongoDB
 from modules.drive_io import DriveIO
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+import os
+import json
+from config import CLIENT_SECRETS_FILE, TOKEN_FILE
+
+# OAuth Scopes
+SCOPES = [
+    'https://www.googleapis.com/auth/spreadsheets',
+    'https://www.googleapis.com/auth/drive.file'
+]
 
 class AuthManager:
-    def __init__(self, credentials_path):
-        self.db = BongoDB(credentials_path)
-        self.drive = DriveIO(credentials_path)
+    def __init__(self, credentials=None):
+        self.creds = credentials
+        if credentials:
+            self.db = BongoDB(credentials)
+            self.drive = DriveIO(credentials)
+
+    @staticmethod
+    def get_credentials():
+        creds = None
+        if os.path.exists(TOKEN_FILE):
+            creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
+        
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+            else:
+                if not os.path.exists(CLIENT_SECRETS_FILE):
+                    raise FileNotFoundError(f"{CLIENT_SECRETS_FILE} not found. Please download it from Google Cloud Console.")
+                
+                flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
+                creds = flow.run_local_server(port=0)
+            
+            with open(TOKEN_FILE, 'w') as token:
+                token.write(creds.to_json())
+        
+        return creds
 
     def self_check(self):
         # 1. Check Sheet Access

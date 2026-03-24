@@ -4,30 +4,19 @@ import json
 import os
 from modules.auth_manager import AuthManager
 
-def initial_handshake():
-    # 1. Initial Handshake: On startup, the console must prompt: Input Your Api Path (JSON):
-    print("Welcome to BongoDB Portable (v2.0)")
-    if os.path.exists('credentials.json'):
-        print("Found credentials.json in root. Using it for initialization...")
-        return 'credentials.json'
-    
-    while True:
-        api_path = input("Input Your Api Path (JSON): ").strip()
-        if os.path.exists(api_path):
-            try:
-                with open(api_path, 'r') as f:
-                    json.load(f) # Validate JSON
-                return api_path
-            except Exception as e:
-                print(f"Invalid JSON file: {e}")
-        else:
-            print("File not found. Please provide a valid path.")
-
 def main():
-    api_path = initial_handshake()
-    auth = AuthManager(api_path)
+    print("Welcome to BongoDB Portable (v2.0) - OAuth Edition")
     
-    print("Performing self-check...")
+    # Trigger OAuth flow
+    try:
+        creds = AuthManager.get_credentials()
+        auth = AuthManager(creds)
+    except Exception as e:
+        print(f"\n[!] Authentication Failed: {e}")
+        print(f"Make sure 'client_secrets.json' is in the project root.")
+        sys.exit(1)
+    
+    print("Performing system self-check...")
     ok, status = auth.self_check()
     if not ok:
         print(f"\n[!] SYSTEM CHECK FAILED:\n{status}")
