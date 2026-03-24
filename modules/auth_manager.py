@@ -9,6 +9,26 @@ class AuthManager:
         self.db = BongoDB(credentials_path)
         self.drive = DriveIO(credentials_path)
 
+    def self_check(self):
+        # 1. Check Sheet Access
+        try:
+            self.db.get_sheet()
+        except Exception as e:
+            return False, f"Google Sheet Access Error: {e}\nTIP: Make sure you shared the sheet with the service account email as Editor."
+            
+        # 2. Check Drive Access
+        try:
+            self.drive.service.files().get(fileId=self.drive.credentials_path if hasattr(self.drive, 'credentials_path') else os.getenv('BONGODB_DRIVE_FOLDER_ID')).execute()
+        except:
+            # Fallback check: list files in root folder
+            from config import DRIVE_ROOT_FOLDER_ID
+            try:
+                self.drive.service.files().get(fileId=DRIVE_ROOT_FOLDER_ID).execute()
+            except Exception as e:
+                return False, f"Google Drive Access Error: {e}\nTIP: Make sure you shared the folder with the service account email as Editor."
+                
+        return True, "All systems operational!"
+
     def register(self, name, email, password, image_path):
         # 1. Generate unique UID (UUID4)
         uid = str(uuid.uuid4())

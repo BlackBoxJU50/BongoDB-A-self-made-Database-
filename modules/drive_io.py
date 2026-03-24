@@ -33,7 +33,7 @@ class DriveIO:
             'name': filename,
             'parents': [folder_id]
         }
-        media = MediaFileUpload(file_path, resumable=True)
+        media = MediaFileUpload(file_path, resumable=False)
         file = self.service.files().create(
             body=file_metadata, media_body=media, fields='id'
         ).execute()

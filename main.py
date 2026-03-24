@@ -26,6 +26,14 @@ def initial_handshake():
 def main():
     api_path = initial_handshake()
     auth = AuthManager(api_path)
+    
+    print("Performing self-check...")
+    ok, status = auth.self_check()
+    if not ok:
+        print(f"\n[!] SYSTEM CHECK FAILED:\n{status}")
+        # We don't exit, but warn the user.
+    else:
+        print(f"[*] {status}")
 
     while True:
         print("\n--- BongoDB CLI ---")
