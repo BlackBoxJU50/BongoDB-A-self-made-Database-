@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BongoDB Profile - {{ user.Name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --accent-color: #58a6ff;
+            --text-color: #c9d1d9;
+        }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .profile-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            border: 1px solid #30363d;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        .profile-image {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 2rem;
+            border: 4px solid var(--accent-color);
+            padding: 4px;
+            background-color: var(--bg-color);
+        }
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+            background: linear-gradient(135deg, #58a6ff, #bc8cff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .user-info {
+            margin-top: 1.5rem;
+            text-align: left;
+            padding: 1rem;
+            background-color: #0d1117;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+        }
+        .info-item {
+            margin-bottom: 1rem;
+        }
+        .label {
+            display: block;
+            font-size: 0.8rem;
+            color: #8b949e;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.2rem;
+        }
+        .value {
+            font-weight: 400;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-card">
+        <img src="{{ user.Image_URL }}" alt="{{ user.Name }}" class="profile-image">
+        <h1>{{ user.Name }}</h1>
+        <div class="user-info">
+            <div class="info-item">
+                <span class="label">Unique ID (UID)</span>
+                <span class="value">{{ user.UID }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Email Address</span>
+                <span class="value">{{ user.Email }}</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
