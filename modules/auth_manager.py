@@ -12,7 +12,7 @@ from config import CLIENT_SECRETS_FILE, TOKEN_FILE
 # OAuth Scopes
 SCOPES = [
     'https://www.googleapis.com/auth/spreadsheets',
-    'https://www.googleapis.com/auth/drive.file'
+    'https://www.googleapis.com/auth/drive'
 ]
 
 class AuthManager:
@@ -74,8 +74,8 @@ class AuthManager:
         except Exception as e:
             return False, f"Drive Error: {str(e)}"
 
-        # 3. Sheet Logic: Append row
-        hashed_password = generate_password_hash(password)
+        # 2. Hash password (using pbkdf2:sha256 as fallback for scrypt issues)
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
         try:
             self.db.add_user(uid, name, email, hashed_password, folder_id, image_url)
         except Exception as e:
