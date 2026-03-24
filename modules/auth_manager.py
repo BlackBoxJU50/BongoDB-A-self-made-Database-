@@ -1,4 +1,5 @@
 import uuid
+import random
 from werkzeug.security import generate_password_hash, check_password_hash
 from modules.bongo_db import BongoDB
 from modules.drive_io import DriveIO
@@ -64,10 +65,11 @@ class AuthManager:
         return True, "All systems operational!"
 
     def register(self, name, email, password, image_path):
-        # 1. Generate unique UID (UUID4)
-        uid = str(uuid.uuid4())
-
-        # 2. Drive Logic: Create folder named UID and upload image
+        # 1. Generate unique UID (Name-RandomDigits)
+        random_id = random.randint(10000000, 99999999)
+        uid = f"{name.replace(' ', '')}-{random_id}"
+        
+        # 2. Drive Logic: Create folder named after UID and upload image
         try:
             folder_id = self.drive.create_uid_folder(uid)
             file_id, image_url = self.drive.upload_image(image_path, folder_id)
