@@ -16,13 +16,17 @@ class BongoCollection:
     def get_or_create(self):
         try:
             sheet = self.spreadsheet.worksheet(self.name)
-            # Ensure headers are correct if sheet exists
             curr_headers = sheet.row_values(1)
-            if not curr_headers or curr_headers != self.headers:
-                sheet.update('A1', [self.headers])
+            
+            if self.headers and len(self.headers) > 0:
+                if not curr_headers or curr_headers != self.headers:
+                    sheet.update('A1', [self.headers])
+            else:
+                self.headers = curr_headers
             return sheet
         except gspread.exceptions.WorksheetNotFound:
-            # Auto-Setup for new collections
+            if not self.headers:
+                self.headers = ['ID', 'Timestamp', 'Data']
             sheet = self.spreadsheet.add_worksheet(title=self.name, rows=1000, cols=max(20, len(self.headers)))
             sheet.update('A1', [self.headers])
             return sheet
@@ -31,8 +35,8 @@ class BongoCollection:
         self.sheet.append_row(data_list)
 
     def find_all(self):
-        # Use expected_headers to avoid 'duplicate empty column' errors
-        return self.sheet.get_all_records(expected_headers=self.headers)
+        headers = self.headers if (self.headers and len(self.headers) > 0) else None
+        return self.sheet.get_all_records(expected_headers=headers)
 
     def find_one(self, key, value):
         records = self.find_all()

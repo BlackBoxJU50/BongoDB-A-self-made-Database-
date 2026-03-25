@@ -102,3 +102,12 @@ class AuthManager:
             return False, f"Google Drive Access Error: {e}"
                  
         return True, "Cloud Storage Connected!"
+
+    @staticmethod
+    def disconnect():
+        base_dir = AuthManager.get_base_dir()
+        token_path = os.path.join(base_dir, TOKEN_FILE)
+        if os.path.exists(token_path):
+            os.remove(token_path)
+            return True
+        return False

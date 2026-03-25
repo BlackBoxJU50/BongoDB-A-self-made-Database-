@@ -55,7 +55,7 @@ def save_settings(ss_id, dr_id):
     with open(settings_path, 'w') as f:
         json.dump({'spreadsheet_id': ss_id, 'drive_id': dr_id}, f)
 
-def get_db():
+def get_auth():
     base_dir = AuthManager.get_base_dir()
     creds_path = os.path.join(base_dir, config.CLIENT_SECRETS_FILE)
     
@@ -65,27 +65,33 @@ def get_db():
     try:
         creds = AuthManager.get_credentials()
         if not creds:
-            print("[!] get_db: No credentials returned from AuthManager.")
+            print("[!] get_auth: No credentials returned from AuthManager.")
             return None
         
         # Load dynamic settings
         settings = get_settings()
         
-        # Override config IDs for this instance (for other modules)
+        # Override config IDs for this instance
         config.SPREADSHEET_ID = settings['spreadsheet_id']
         config.DRIVE_ROOT_FOLDER_ID = settings['drive_id']
         
         auth_mgr = AuthManager(creds, spreadsheet_id=settings['spreadsheet_id'])
         if not auth_mgr.db:
-            print("[!] get_db: AuthManager initialized but database engine is None.")
+            print("[!] get_auth: AuthManager initialized but database engine is None.")
             return None
             
-        return auth_mgr.db
+        return auth_mgr
     except Exception as e:
-        print(f"[!] CRITICAL DB INIT ERROR: {e}")
+        print(f"[!] CRITICAL AUTH INIT ERROR: {e}")
         import traceback
         traceback.print_exc()
-        return str(e) # Return the error string to show in UI
+        return str(e)
+
+def get_db():
+    auth = get_auth()
+    if isinstance(auth, str) or auth is None:
+        return auth
+    return auth.db
 
 @app.route('/authenticate')
 def authenticate():
@@ -211,6 +217,40 @@ def api_create_collection():
         return jsonify({"status": "success", "message": "Collection created successfully"}), 201
     except Exception as e:
         return jsonify({"status": "error", "error": str(e)}), 500
+
+@app.route('/api/v1/upload', methods=['POST'])
+def api_upload():
+    auth = get_auth()
+    if not auth or isinstance(auth, str):
+        return jsonify({"status": "error", "error": "Cloud connection failed"}), 500
+        
+    if 'file' not in request.files:
+        return jsonify({"status": "error", "error": "No file part"}), 400
+        
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"status": "error", "error": "No selected file"}), 400
+        
+    filename = secure_filename(file.filename)
+    temp_path = os.path.join('/tmp', filename)
+    file.save(temp_path)
+    
+    try:
+        settings = get_settings()
+        folder_id = request.form.get('folder_id', settings.get('drive_id'))
+        file_id, image_url = auth.drive.upload_image(temp_path, folder_id)
+        os.remove(temp_path)
+        return jsonify({"status": "success", "file_id": file_id, "url": image_url}), 201
+    except Exception as e:
+        if os.path.exists(temp_path): os.remove(temp_path)
+        return jsonify({"status": "error", "error": str(e)}), 500
+
+@app.route('/logout')
+def logout():
+    AuthManager.disconnect()
+    session.clear()
+    flash("Disconnected from Google account.", "info")
+    return redirect(url_for('dashboard'))
 
 @app.route('/docs')
 def docs():

@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="glass-card">
+    <h1 style="margin-bottom: 0.5rem; font-size: 2rem;">Login</h1>
+    <p style="color: rgba(255,255,255,0.5); margin-bottom: 2rem;">Welcome back to BongoDB.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+        <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" name="email" class="form-control" placeholder="john@example.com" required>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem; padding: 1rem;">Access Account</button>
+    </form>
+    
+    <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: rgba(255,255,255,0.5);">
+        New here? <a href="/signup" style="color: var(--primary); text-decoration: none;">Create an account</a>
+    </p>
+</div>
+{% endblock %}

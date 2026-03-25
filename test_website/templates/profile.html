@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="glass-card" style="text-align: center;">
+    <div style="margin-bottom: 2rem;">
+        <img src="{{ user.ImageURL }}" alt="Profile" style="width: 120px; height: 120px; border-radius: 60px; object-fit: cover; border: 3px solid var(--primary); padding: 5px; background: rgba(255,255,255,0.05);">
+    </div>
+    
+    <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">Hello, {{ user.Name }}!</h1>
+    <p style="color: rgba(255,255,255,0.5); margin-bottom: 2.5rem;">{{ user.Email }}</p>
+    
+    <div style="background: rgba(0,0,0,0.2); border-radius: 16px; padding: 2rem; border: 1px solid var(--glass-border); text-align: left; margin-bottom: 2rem;">
+        <h3 style="font-size: 1rem; color: var(--primary); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 1px;">User Information</h3>
+        <p style="margin-bottom: 0.8rem;"><span style="color: rgba(255,255,255,0.4);">Database ID:</span> <span style="font-family: monospace;">{{ user.Email.split('@')[0] }}</span></p>
+        <p><span style="color: rgba(255,255,255,0.4);">Cloud Provider:</span> <span style="font-weight: 500;">BongoDB Engine</span></p>
+    </div>
+
+    <a href="/logout" class="btn btn-outline" style="display: block; width: 100%; color: var(--accent);">Sign Out</a>
+</div>
+{% endblock %}
